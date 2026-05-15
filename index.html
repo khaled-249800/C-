@@ -1,0 +1,1879 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>امتحان لغة C++ - المحاضرات 8-11</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;800;900&family=Cairo:wght@300;400;600;700;900&display=swap');
+
+  :root {
+    --primary: #1a1a2e;
+    --secondary: #16213e;
+    --accent: #0f3460;
+    --gold: #e94560;
+    --gold2: #f5a623;
+    --teal: #00b4d8;
+    --green: #06d6a0;
+    --red: #ef233c;
+    --white: #f8f9fa;
+    --card-bg: rgba(255,255,255,0.04);
+    --border: rgba(255,255,255,0.1);
+    --text: #e0e0e0;
+    --text-dim: #a0a0b0;
+    --shadow: 0 20px 60px rgba(0,0,0,0.5);
+    --radius: 16px;
+    --radius-sm: 10px;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Cairo', 'Tajawal', sans-serif;
+    background: var(--primary);
+    color: var(--text);
+    min-height: 100vh;
+    direction: rtl;
+    overflow-x: hidden;
+  }
+
+  body::before {
+    content: '';
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background:
+      radial-gradient(ellipse at 20% 20%, rgba(14,52,96,0.4) 0%, transparent 50%),
+      radial-gradient(ellipse at 80% 80%, rgba(233,69,96,0.15) 0%, transparent 50%),
+      radial-gradient(ellipse at 50% 50%, rgba(0,180,216,0.08) 0%, transparent 70%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .container {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 20px;
+    position: relative;
+    z-index: 1;
+  }
+
+  /* ===== HEADER ===== */
+  .site-header {
+    text-align: center;
+    padding: 40px 20px 30px;
+    position: relative;
+    z-index: 1;
+  }
+
+  .site-header .badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(233,69,96,0.15);
+    border: 1px solid rgba(233,69,96,0.3);
+    color: var(--gold);
+    padding: 6px 18px;
+    border-radius: 50px;
+    font-size: 13px;
+    font-weight: 600;
+    margin-bottom: 20px;
+    letter-spacing: 1px;
+  }
+
+  .site-header h1 {
+    font-size: clamp(28px, 5vw, 48px);
+    font-weight: 900;
+    background: linear-gradient(135deg, #fff 0%, var(--teal) 50%, var(--gold) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    line-height: 1.2;
+    margin-bottom: 12px;
+  }
+
+  .site-header p {
+    color: var(--text-dim);
+    font-size: 15px;
+    max-width: 500px;
+    margin: 0 auto;
+  }
+
+  .header-line {
+    width: 80px;
+    height: 3px;
+    background: linear-gradient(90deg, var(--gold), var(--teal));
+    margin: 20px auto 0;
+    border-radius: 3px;
+  }
+
+  /* ===== SCREENS ===== */
+  .screen { display: none; }
+  .screen.active { display: block; animation: fadeIn 0.5s ease; }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ===== REGISTRATION SCREEN ===== */
+  .reg-card {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 50px 40px;
+    max-width: 500px;
+    margin: 0 auto;
+    backdrop-filter: blur(20px);
+    box-shadow: var(--shadow);
+    text-align: center;
+  }
+
+  .reg-icon {
+    width: 80px;
+    height: 80px;
+    background: linear-gradient(135deg, var(--accent), var(--gold));
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 24px;
+    font-size: 32px;
+    box-shadow: 0 10px 30px rgba(233,69,96,0.3);
+  }
+
+  .reg-card h2 {
+    font-size: 26px;
+    font-weight: 800;
+    margin-bottom: 8px;
+    color: #fff;
+  }
+
+  .reg-card p {
+    color: var(--text-dim);
+    font-size: 14px;
+    margin-bottom: 32px;
+  }
+
+  .info-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-bottom: 28px;
+    text-align: right;
+  }
+
+  .info-item {
+    background: rgba(0,180,216,0.08);
+    border: 1px solid rgba(0,180,216,0.2);
+    border-radius: var(--radius-sm);
+    padding: 12px 16px;
+  }
+
+  .info-item .num {
+    font-size: 22px;
+    font-weight: 900;
+    color: var(--teal);
+    display: block;
+  }
+
+  .info-item .lbl {
+    font-size: 12px;
+    color: var(--text-dim);
+  }
+
+  .form-group {
+    margin-bottom: 20px;
+    text-align: right;
+  }
+
+  .form-group label {
+    display: block;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-dim);
+    margin-bottom: 8px;
+  }
+
+  .form-group input {
+    width: 100%;
+    background: rgba(255,255,255,0.05);
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 14px 18px;
+    color: #fff;
+    font-family: 'Cairo', sans-serif;
+    font-size: 15px;
+    outline: none;
+    transition: all 0.3s;
+    direction: rtl;
+  }
+
+  .form-group input:focus {
+    border-color: var(--teal);
+    background: rgba(0,180,216,0.05);
+    box-shadow: 0 0 0 3px rgba(0,180,216,0.1);
+  }
+
+  .form-group input::placeholder { color: var(--text-dim); }
+
+  .btn-primary {
+    width: 100%;
+    background: linear-gradient(135deg, var(--gold), #c73652);
+    border: none;
+    border-radius: var(--radius-sm);
+    padding: 16px;
+    color: #fff;
+    font-family: 'Cairo', sans-serif;
+    font-size: 16px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.3s;
+    letter-spacing: 0.5px;
+    box-shadow: 0 8px 25px rgba(233,69,96,0.4);
+  }
+
+  .btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 35px rgba(233,69,96,0.5);
+  }
+
+  .btn-primary:active { transform: translateY(0); }
+
+  /* ===== EXAM SCREEN ===== */
+  .exam-topbar {
+    background: rgba(255,255,255,0.03);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 16px 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 24px;
+    backdrop-filter: blur(10px);
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+
+  .topbar-student {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .student-avatar {
+    width: 40px;
+    height: 40px;
+    background: linear-gradient(135deg, var(--teal), var(--accent));
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    font-weight: 700;
+    color: #fff;
+  }
+
+  .student-name {
+    font-weight: 700;
+    font-size: 15px;
+    color: #fff;
+  }
+
+  .topbar-stats {
+    display: flex;
+    gap: 20px;
+    align-items: center;
+  }
+
+  .stat-chip {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+    color: var(--text-dim);
+  }
+
+  .stat-chip .val {
+    font-weight: 700;
+    color: var(--teal);
+  }
+
+  .timer-chip {
+    background: rgba(233,69,96,0.15);
+    border: 1px solid rgba(233,69,96,0.3);
+    border-radius: 50px;
+    padding: 6px 16px;
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--gold);
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* Progress Bar */
+  .progress-wrap {
+    margin-bottom: 28px;
+  }
+
+  .progress-header {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 8px;
+    font-size: 13px;
+    color: var(--text-dim);
+  }
+
+  .progress-bar-outer {
+    height: 6px;
+    background: rgba(255,255,255,0.08);
+    border-radius: 6px;
+    overflow: hidden;
+  }
+
+  .progress-bar-inner {
+    height: 100%;
+    background: linear-gradient(90deg, var(--teal), var(--gold));
+    border-radius: 6px;
+    transition: width 0.4s cubic-bezier(0.4,0,0.2,1);
+  }
+
+  /* Questions */
+  .question-card {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 28px 32px;
+    margin-bottom: 20px;
+    backdrop-filter: blur(10px);
+    transition: border-color 0.3s;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .question-card::before {
+    content: '';
+    position: absolute;
+    top: 0; right: 0;
+    width: 4px;
+    height: 100%;
+    background: linear-gradient(to bottom, var(--teal), var(--gold));
+    border-radius: 0 var(--radius) var(--radius) 0;
+  }
+
+  .question-card.answered { border-color: rgba(0,180,216,0.3); }
+  .question-card.correct { border-color: rgba(6,214,160,0.5); }
+  .question-card.wrong { border-color: rgba(239,35,60,0.5); }
+
+  .question-header {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    margin-bottom: 20px;
+  }
+
+  .q-number {
+    min-width: 36px;
+    height: 36px;
+    background: linear-gradient(135deg, var(--accent), #0a2a50);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+    font-weight: 800;
+    color: var(--teal);
+    flex-shrink: 0;
+    border: 1px solid rgba(0,180,216,0.3);
+  }
+
+  .q-type-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 11px;
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-weight: 600;
+    margin-bottom: 8px;
+  }
+
+  .q-type-mcq { background: rgba(0,180,216,0.15); color: var(--teal); border: 1px solid rgba(0,180,216,0.25); }
+  .q-type-tf { background: rgba(245,166,35,0.15); color: var(--gold2); border: 1px solid rgba(245,166,35,0.25); }
+  .q-type-match { background: rgba(6,214,160,0.15); color: var(--green); border: 1px solid rgba(6,214,160,0.25); }
+  .q-type-choose { background: rgba(163,89,255,0.15); color: #a359ff; border: 1px solid rgba(163,89,255,0.25); }
+
+  .q-text {
+    font-size: 16px;
+    font-weight: 600;
+    color: #fff;
+    line-height: 1.7;
+    flex: 1;
+  }
+
+  .q-text code {
+    background: rgba(0,0,0,0.4);
+    border: 1px solid rgba(255,255,255,0.1);
+    padding: 1px 8px;
+    border-radius: 4px;
+    font-family: 'Courier New', monospace;
+    font-size: 14px;
+    color: var(--teal);
+    direction: ltr;
+    display: inline-block;
+  }
+
+  /* Options */
+  .options-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .option-label {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 14px 18px;
+    background: rgba(255,255,255,0.03);
+    border: 1.5px solid rgba(255,255,255,0.08);
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    transition: all 0.25s;
+    user-select: none;
+  }
+
+  .option-label:hover {
+    background: rgba(0,180,216,0.06);
+    border-color: rgba(0,180,216,0.3);
+    transform: translateX(-3px);
+  }
+
+  .option-label input[type="radio"],
+  .option-label input[type="checkbox"] {
+    display: none;
+  }
+
+  .option-dot {
+    width: 20px;
+    height: 20px;
+    border: 2px solid rgba(255,255,255,0.2);
+    border-radius: 50%;
+    flex-shrink: 0;
+    transition: all 0.25s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .option-label input:checked ~ .option-dot {
+    background: var(--teal);
+    border-color: var(--teal);
+    box-shadow: 0 0 0 3px rgba(0,180,216,0.2);
+  }
+
+  .option-label input:checked ~ .option-dot::after {
+    content: '';
+    width: 8px;
+    height: 8px;
+    background: #fff;
+    border-radius: 50%;
+  }
+
+  .option-label input:checked + .option-dot,
+  .option-label:has(input:checked) {
+    background: rgba(0,180,216,0.08);
+    border-color: rgba(0,180,216,0.4);
+  }
+
+  .option-label:has(input:checked) {
+    background: rgba(0,180,216,0.08);
+    border-color: rgba(0,180,216,0.4);
+  }
+
+  .option-text {
+    font-size: 14px;
+    color: var(--text);
+    flex: 1;
+    line-height: 1.5;
+  }
+
+  .option-text code {
+    background: rgba(0,0,0,0.4);
+    border: 1px solid rgba(255,255,255,0.1);
+    padding: 1px 7px;
+    border-radius: 4px;
+    font-family: 'Courier New', monospace;
+    font-size: 13px;
+    color: var(--gold2);
+    direction: ltr;
+    display: inline-block;
+  }
+
+  /* Result States */
+  .option-label.correct-ans {
+    background: rgba(6,214,160,0.12) !important;
+    border-color: var(--green) !important;
+  }
+
+  .option-label.wrong-ans {
+    background: rgba(239,35,60,0.12) !important;
+    border-color: var(--red) !important;
+  }
+
+  .option-label.correct-ans .option-dot { background: var(--green); border-color: var(--green); }
+  .option-label.wrong-ans .option-dot { background: var(--red); border-color: var(--red); }
+
+  .option-label.disabled { pointer-events: none; }
+
+  .answer-feedback {
+    display: none;
+    margin-top: 14px;
+    padding: 12px 16px;
+    border-radius: var(--radius-sm);
+    font-size: 13px;
+    font-weight: 600;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .answer-feedback.show { display: flex; }
+  .answer-feedback.correct { background: rgba(6,214,160,0.12); border: 1px solid rgba(6,214,160,0.3); color: var(--green); }
+  .answer-feedback.incorrect { background: rgba(239,35,60,0.12); border: 1px solid rgba(239,35,60,0.3); color: var(--red); }
+
+  /* TF Options */
+  .tf-options {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+
+  .tf-option {
+    padding: 18px;
+    background: rgba(255,255,255,0.03);
+    border: 1.5px solid rgba(255,255,255,0.08);
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    transition: all 0.25s;
+    text-align: center;
+    font-size: 15px;
+    font-weight: 700;
+    user-select: none;
+  }
+
+  .tf-option:hover { transform: translateY(-2px); }
+  .tf-option.true-opt:hover { background: rgba(6,214,160,0.08); border-color: rgba(6,214,160,0.4); }
+  .tf-option.false-opt:hover { background: rgba(239,35,60,0.08); border-color: rgba(239,35,60,0.4); }
+  .tf-option.selected.true-opt { background: rgba(6,214,160,0.15); border-color: var(--green); color: var(--green); }
+  .tf-option.selected.false-opt { background: rgba(239,35,60,0.15); border-color: var(--red); color: var(--red); }
+  .tf-option.correct-ans { background: rgba(6,214,160,0.15) !important; border-color: var(--green) !important; color: var(--green) !important; }
+  .tf-option.wrong-ans { background: rgba(239,35,60,0.15) !important; border-color: var(--red) !important; color: var(--red) !important; }
+  .tf-option.disabled { pointer-events: none; }
+
+  /* Match Options */
+  .match-grid {
+    display: grid;
+    gap: 12px;
+  }
+
+  .match-row {
+    display: grid;
+    grid-template-columns: 1fr 40px 1fr;
+    gap: 10px;
+    align-items: center;
+  }
+
+  .match-term {
+    background: rgba(0,180,216,0.08);
+    border: 1px solid rgba(0,180,216,0.2);
+    border-radius: var(--radius-sm);
+    padding: 12px 16px;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--teal);
+    text-align: center;
+  }
+
+  .match-arrow {
+    text-align: center;
+    color: var(--text-dim);
+    font-size: 18px;
+  }
+
+  .match-select {
+    background: rgba(255,255,255,0.04);
+    border: 1.5px solid rgba(255,255,255,0.1);
+    border-radius: var(--radius-sm);
+    padding: 12px 14px;
+    color: var(--text);
+    font-family: 'Cairo', sans-serif;
+    font-size: 14px;
+    outline: none;
+    cursor: pointer;
+    transition: all 0.25s;
+    direction: rtl;
+    width: 100%;
+    appearance: none;
+  }
+
+  .match-select:focus { border-color: var(--teal); }
+  .match-select option { background: #1a1a2e; color: #fff; }
+
+  .match-select.correct { border-color: var(--green); background: rgba(6,214,160,0.08); color: var(--green); }
+  .match-select.wrong { border-color: var(--red); background: rgba(239,35,60,0.08); color: var(--red); }
+
+  /* Submit Button */
+  .submit-section {
+    text-align: center;
+    padding: 30px 0 50px;
+  }
+
+  .btn-submit {
+    background: linear-gradient(135deg, #06d6a0, #0a9e76);
+    border: none;
+    border-radius: 50px;
+    padding: 18px 60px;
+    color: #fff;
+    font-family: 'Cairo', sans-serif;
+    font-size: 17px;
+    font-weight: 800;
+    cursor: pointer;
+    transition: all 0.3s;
+    box-shadow: 0 10px 30px rgba(6,214,160,0.35);
+    letter-spacing: 0.5px;
+  }
+
+  .btn-submit:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 15px 40px rgba(6,214,160,0.45);
+  }
+
+  /* ===== RESULT SCREEN ===== */
+  .result-hero {
+    text-align: center;
+    padding: 40px 20px;
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    margin-bottom: 28px;
+    backdrop-filter: blur(20px);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .result-hero::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 300px;
+    height: 300px;
+    background: radial-gradient(circle, rgba(0,180,216,0.15) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  .result-trophy {
+    font-size: 64px;
+    margin-bottom: 16px;
+    animation: bounce 1s ease;
+  }
+
+  @keyframes bounce {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-15px); }
+  }
+
+  .result-name {
+    font-size: 22px;
+    font-weight: 800;
+    color: #fff;
+    margin-bottom: 6px;
+  }
+
+  .result-eval {
+    font-size: 18px;
+    font-weight: 700;
+    margin-bottom: 28px;
+  }
+
+  .score-circle-wrap {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 28px;
+  }
+
+  .score-circle {
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    background: conic-gradient(var(--teal) 0%, var(--teal) var(--pct), rgba(255,255,255,0.06) var(--pct));
+    box-shadow: 0 0 40px rgba(0,180,216,0.3);
+  }
+
+  .score-circle::before {
+    content: '';
+    position: absolute;
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    background: var(--primary);
+  }
+
+  .score-inner {
+    position: relative;
+    z-index: 1;
+    text-align: center;
+  }
+
+  .score-num {
+    font-size: 32px;
+    font-weight: 900;
+    color: #fff;
+    line-height: 1;
+  }
+
+  .score-total {
+    font-size: 13px;
+    color: var(--text-dim);
+  }
+
+  .score-pct {
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--teal);
+    margin-top: 4px;
+  }
+
+  .result-stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+    margin-top: 8px;
+  }
+
+  .r-stat {
+    background: rgba(255,255,255,0.04);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 16px 10px;
+    text-align: center;
+  }
+
+  .r-stat .r-val {
+    font-size: 22px;
+    font-weight: 900;
+    display: block;
+    margin-bottom: 4px;
+  }
+
+  .r-stat .r-lbl {
+    font-size: 12px;
+    color: var(--text-dim);
+  }
+
+  .r-correct .r-val { color: var(--green); }
+  .r-wrong .r-val { color: var(--red); }
+  .r-time .r-val { color: var(--gold2); }
+
+  /* Leaderboard */
+  .section-title {
+    font-size: 20px;
+    font-weight: 800;
+    color: #fff;
+    margin-bottom: 18px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .leaderboard-table {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    overflow: hidden;
+    backdrop-filter: blur(10px);
+    margin-bottom: 28px;
+  }
+
+  .lb-header {
+    display: grid;
+    grid-template-columns: 50px 1fr 80px 90px 100px;
+    gap: 10px;
+    padding: 14px 20px;
+    background: rgba(255,255,255,0.04);
+    border-bottom: 1px solid var(--border);
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--text-dim);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  .lb-row {
+    display: grid;
+    grid-template-columns: 50px 1fr 80px 90px 100px;
+    gap: 10px;
+    padding: 14px 20px;
+    border-bottom: 1px solid rgba(255,255,255,0.04);
+    transition: background 0.2s;
+    align-items: center;
+    font-size: 14px;
+  }
+
+  .lb-row:last-child { border-bottom: none; }
+  .lb-row:hover { background: rgba(255,255,255,0.03); }
+  .lb-row.highlight { background: rgba(0,180,216,0.08); border-right: 3px solid var(--teal); }
+
+  .rank-badge {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+    font-weight: 800;
+  }
+
+  .rank-1 { background: linear-gradient(135deg, #ffd700, #ff8c00); color: #000; }
+  .rank-2 { background: linear-gradient(135deg, #c0c0c0, #808080); color: #000; }
+  .rank-3 { background: linear-gradient(135deg, #cd7f32, #8b4513); color: #fff; }
+  .rank-other { background: rgba(255,255,255,0.1); color: var(--text-dim); }
+
+  .lb-name { font-weight: 600; color: #fff; }
+  .lb-score { font-weight: 700; color: var(--teal); }
+  .lb-pct { font-weight: 600; color: var(--text-dim); }
+
+  .eval-pill {
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 700;
+    display: inline-block;
+  }
+
+  .eval-ممتاز { background: rgba(0,180,216,0.2); color: var(--teal); }
+  .eval-جيد\ جداً { background: rgba(6,214,160,0.2); color: var(--green); }
+  .eval-جيد { background: rgba(245,166,35,0.2); color: var(--gold2); }
+  .eval-مقبول { background: rgba(163,89,255,0.2); color: #a359ff; }
+  .eval-يحتاج\ مراجعة { background: rgba(239,35,60,0.2); color: var(--red); }
+
+  /* Buttons */
+  .action-buttons {
+    display: flex;
+    gap: 14px;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-bottom: 60px;
+  }
+
+  .btn-retry {
+    background: linear-gradient(135deg, var(--gold), #c73652);
+    border: none;
+    border-radius: 50px;
+    padding: 15px 40px;
+    color: #fff;
+    font-family: 'Cairo', sans-serif;
+    font-size: 15px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.3s;
+    box-shadow: 0 8px 25px rgba(233,69,96,0.3);
+  }
+
+  .btn-retry:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 35px rgba(233,69,96,0.4);
+  }
+
+  .btn-review {
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.15);
+    border-radius: 50px;
+    padding: 15px 40px;
+    color: #fff;
+    font-family: 'Cairo', sans-serif;
+    font-size: 15px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.3s;
+  }
+
+  .btn-review:hover {
+    background: rgba(255,255,255,0.1);
+    transform: translateY(-2px);
+  }
+
+  /* Footer */
+  .site-footer {
+    text-align: center;
+    padding: 24px;
+    border-top: 1px solid var(--border);
+    color: var(--text-dim);
+    font-size: 13px;
+    position: relative;
+    z-index: 1;
+  }
+
+  .site-footer span {
+    background: linear-gradient(135deg, var(--teal), var(--gold));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    font-weight: 700;
+  }
+
+  /* Responsive */
+  @media (max-width: 600px) {
+    .reg-card { padding: 30px 20px; }
+    .question-card { padding: 20px 18px; }
+    .match-row { grid-template-columns: 1fr; }
+    .match-arrow { display: none; }
+    .lb-header, .lb-row { grid-template-columns: 40px 1fr 70px 80px; font-size: 12px; }
+    .lb-header > :last-child, .lb-row > :last-child { display: none; }
+    .result-stats { grid-template-columns: 1fr 1fr 1fr; }
+    .tf-options { grid-template-columns: 1fr; }
+    .info-grid { grid-template-columns: 1fr 1fr; }
+    .topbar-stats { gap: 12px; }
+  }
+
+  /* Confetti */
+  .confetti-piece {
+    position: fixed;
+    width: 8px;
+    height: 16px;
+    top: -20px;
+    animation: confettiFall linear forwards;
+    border-radius: 2px;
+    z-index: 9999;
+    pointer-events: none;
+  }
+
+  @keyframes confettiFall {
+    to { top: 110vh; transform: rotate(720deg) translateX(100px); }
+  }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header class="site-header">
+  <div class="badge">🎓 امتحان إلكتروني</div>
+  <h1>امتحان لغة C++</h1>
+  <p>المحاضرات 8 - 11 | أساسيات البرمجة بلغة C++</p>
+  <div class="header-line"></div>
+</header>
+
+<div class="container">
+
+  <!-- REGISTRATION SCREEN -->
+  <div id="screen-reg" class="screen active">
+    <div class="reg-card">
+      <div class="reg-icon">💻</div>
+      <h2>مرحباً بك في الامتحان</h2>
+      <p>أدخل بياناتك للبدء في الامتحان الإلكتروني</p>
+      <div class="info-grid">
+        <div class="info-item">
+          <span class="num" id="q-count">40</span>
+          <span class="lbl">عدد الأسئلة</span>
+        </div>
+        <div class="info-item">
+          <span class="num">60</span>
+          <span class="lbl">دقيقة للإجابة</span>
+        </div>
+        <div class="info-item">
+          <span class="num">4</span>
+          <span class="lbl">أنواع الأسئلة</span>
+        </div>
+        <div class="info-item">
+          <span class="num">100</span>
+          <span class="lbl">الدرجة الكاملة</span>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>الاسم الكامل</label>
+        <input type="text" id="input-name" placeholder="أدخل اسمك الكامل هنا..." />
+      </div>
+      <button class="btn-primary" onclick="startExam()">🚀 بدء الامتحان</button>
+    </div>
+  </div>
+
+  <!-- EXAM SCREEN -->
+  <div id="screen-exam" class="screen">
+    <div class="exam-topbar">
+      <div class="topbar-student">
+        <div class="student-avatar" id="avatar-letter">م</div>
+        <div>
+          <div class="student-name" id="display-name">الطالب</div>
+          <div style="font-size:12px;color:var(--text-dim);">امتحان C++</div>
+        </div>
+      </div>
+      <div class="topbar-stats">
+        <div class="stat-chip">📝 <span class="val" id="answered-count">0</span> / <span id="total-count">40</span></div>
+        <div class="timer-chip" id="timer">60:00</div>
+      </div>
+    </div>
+
+    <div class="progress-wrap">
+      <div class="progress-header">
+        <span>تقدم الامتحان</span>
+        <span id="progress-pct">0%</span>
+      </div>
+      <div class="progress-bar-outer">
+        <div class="progress-bar-inner" id="progress-bar" style="width:0%"></div>
+      </div>
+    </div>
+
+    <div id="questions-container"></div>
+
+    <div class="submit-section">
+      <button class="btn-submit" onclick="submitExam()">✅ تسليم الامتحان</button>
+    </div>
+  </div>
+
+  <!-- RESULT SCREEN -->
+  <div id="screen-result" class="screen">
+    <div class="result-hero">
+      <div class="result-trophy" id="result-trophy">🏆</div>
+      <div class="result-name" id="result-name">اسم الطالب</div>
+      <div class="result-eval" id="result-eval">ممتاز</div>
+      <div class="score-circle-wrap">
+        <div class="score-circle" id="score-circle">
+          <div class="score-inner">
+            <div class="score-num" id="score-num">0</div>
+            <div class="score-total" id="score-total">/ 40</div>
+            <div class="score-pct" id="score-pct">0%</div>
+          </div>
+        </div>
+      </div>
+      <div class="result-stats">
+        <div class="r-stat r-correct">
+          <span class="r-val" id="r-correct">0</span>
+          <span class="r-lbl">✅ صحيح</span>
+        </div>
+        <div class="r-stat r-wrong">
+          <span class="r-val" id="r-wrong">0</span>
+          <span class="r-lbl">❌ خطأ</span>
+        </div>
+        <div class="r-stat r-time">
+          <span class="r-val" id="r-time">0:00</span>
+          <span class="r-lbl">⏱ الوقت</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="section-title">🏅 لوحة الترتيب</div>
+    <div class="leaderboard-table">
+      <div class="lb-header">
+        <div>الترتيب</div>
+        <div>اسم الطالب</div>
+        <div>الدرجة</div>
+        <div>النسبة</div>
+        <div>التقييم</div>
+      </div>
+      <div id="leaderboard-body"></div>
+    </div>
+
+    <div class="action-buttons">
+      <button class="btn-retry" onclick="retryExam()">🔄 إعادة الامتحان</button>
+      <button class="btn-review" onclick="reviewExam()">📋 مراجعة الإجابات</button>
+    </div>
+  </div>
+
+</div>
+
+<!-- FOOTER -->
+<footer class="site-footer">
+  <p>تم التصميم بواسطة: <span>ヅᏦᎻᎪᏞᎬᎠ乂</span></p>
+</footer>
+
+<script>
+// =============================================
+// QUESTIONS DATA - Extracted from PDFs
+// =============================================
+const allQuestions = [
+  // ========== MCQ ==========
+  {
+    type: 'mcq',
+    text: 'ما هو الصيغة العامة لعبارة <code>if...else</code> في لغة C++؟',
+    options: [
+      'if (condition) { statement1; } else { statement2; }',
+      'if [condition] then statement1 else statement2',
+      'if condition: statement1 else: statement2',
+      'if (condition) statement1 : statement2'
+    ],
+    correct: 0
+  },
+  {
+    type: 'mcq',
+    text: 'ماذا يطبع البرنامج التالي إذا كانت قيمة s = 67؟ <code>if (s >= 50) cout << "Pass"; else cout << "Fail";</code>',
+    options: ['Pass', 'Fail', 'لا يطبع شيء', 'خطأ في البرنامج'],
+    correct: 0
+  },
+  {
+    type: 'mcq',
+    text: 'ما هو رمز المعامل المنطقي AND في لغة C++؟',
+    options: ['&&', '||', '!', '&'],
+    correct: 0
+  },
+  {
+    type: 'mcq',
+    text: 'ما هو رمز المعامل المنطقي OR في لغة C++؟',
+    options: ['||', '&&', '!', '|'],
+    correct: 0
+  },
+  {
+    type: 'mcq',
+    text: 'ما هو رمز المعامل المنطقي NOT في لغة C++؟',
+    options: ['!', '~', '&&', '||'],
+    correct: 0
+  },
+  {
+    type: 'mcq',
+    text: 'ما هو العامل الشرطي (Condition Operator) وكيف يُكتب؟',
+    options: [
+      'يُكتب بـ ? و : ويُعبّر عن if...else في صورتها البسيطة',
+      'يُكتب بـ && و || ويُعبّر عن التحقق المزدوج',
+      'يُكتب بـ == و != ويُعبّر عن المساواة',
+      'يُكتب بـ + و - ويُعبّر عن العمليات الحسابية'
+    ],
+    correct: 0
+  },
+  {
+    type: 'mcq',
+    text: 'ما هو الشكل الصحيح للعامل الشرطي الذي يُعادل: <code>if(s>65) Grade=\'D\'; else Grade=\'F\';</code>؟',
+    options: [
+      "Grade = (s > 65) ? 'D' : 'F';",
+      "Grade = (s > 65) : 'D' ? 'F';",
+      "Grade = 'D' ? (s > 65) : 'F';",
+      "Grade = (s > 65) if 'D' else 'F';"
+    ],
+    correct: 0
+  },
+  {
+    type: 'mcq',
+    text: 'متى تستخدم عبارة switch في C++؟',
+    options: [
+      'عندما تكون كل الشروط مرتبطة بقيمة متغير معين',
+      'عندما نريد تنفيذ حلقة تكرارية',
+      'عندما نريد تعريف دالة جديدة',
+      'عندما نريد إدخال بيانات من المستخدم'
+    ],
+    correct: 0
+  },
+  {
+    type: 'mcq',
+    text: 'ماذا تفعل عبارة break داخل switch؟',
+    options: [
+      'الخروج من القسم ومن عبارة switch',
+      'الانتقال إلى القسم التالي',
+      'إيقاف تنفيذ البرنامج بالكامل',
+      'تجاهل الشرط الحالي'
+    ],
+    correct: 0
+  },
+  {
+    type: 'mcq',
+    text: 'ماذا يحدث إذا لم يتطابق التعبير مع أي case في switch ولا يوجد default؟',
+    options: [
+      'لا يُنفَّذ أي قسم',
+      'يُنفَّذ أول case',
+      'يُنفَّذ آخر case',
+      'يحدث خطأ في البرنامج'
+    ],
+    correct: 0
+  },
+  {
+    type: 'mcq',
+    text: 'ما الفرق بين الأمر break والأمر continue في الحلقات التكرارية؟',
+    options: [
+      'break ينهي الحلقة نهائياً، continue ينهي التكرار الحالي ويبدأ التالي',
+      'كلاهما ينهي الحلقة نهائياً',
+      'break ينهي التكرار الحالي فقط، continue ينهي الحلقة بالكامل',
+      'لا فرق بينهما'
+    ],
+    correct: 0
+  },
+  {
+    type: 'mcq',
+    text: 'ما الذي يفعله الأمر <code>exit(1)</code> في لغة C++؟',
+    options: [
+      'إنهاء البرنامج والخروج إلى محرر لغة C++',
+      'الخروج من الحلقة التكرارية فقط',
+      'الخروج من الدالة الحالية',
+      'حذف المتغيرات من الذاكرة'
+    ],
+    correct: 0
+  },
+  {
+    type: 'mcq',
+    text: 'ما هو الأمر goto ومم يتألف؟',
+    options: [
+      'أمر لنقل التحكم من مكان لآخر، ويحتاج إلى label يتبعها colon(:)',
+      'أمر للخروج من الحلقة التكرارية',
+      'أمر لتعريف دالة جديدة',
+      'أمر لإنهاء البرنامج'
+    ],
+    correct: 0
+  },
+  {
+    type: 'mcq',
+    text: 'ما هي الدالة Function في لغة C++؟',
+    options: [
+      'مجموعة من العبارات تحقق هدفاً معيناً محصورة في جسم واحد له اسم',
+      'متغير يخزن قيمة عددية',
+      'حلقة تكرارية تنفذ جسمها عدة مرات',
+      'أمر شرطي يختار بين قيمتين'
+    ],
+    correct: 0
+  },
+  {
+    type: 'mcq',
+    text: 'كم نوعاً من البرامج الفرعية في لغة C++؟',
+    options: [
+      'نوع واحد فقط هو الدوال (Functions)',
+      'نوعان: الدوال والإجراءات',
+      'ثلاثة أنواع: الدوال والإجراءات والكلاسات',
+      'لا يوجد برامج فرعية في C++'
+    ],
+    correct: 0
+  },
+  {
+    type: 'mcq',
+    text: 'ما هي الصيغة العامة لنموذج الدالة (prototype) في C++؟',
+    options: [
+      'Return_type Function_name (Argument);',
+      'Function_name Return_type (Argument);',
+      'Argument Function_name (Return_type);',
+      'void Function_name [Argument];'
+    ],
+    correct: 0
+  },
+  {
+    type: 'mcq',
+    text: 'ماذا تعني كلمة void قبل اسم الدالة؟',
+    options: [
+      'الدالة ليس لها قيمة راجعة',
+      'الدالة تستقبل قيمة من نوع void',
+      'الدالة فارغة ولا تنفذ أي شيء',
+      'الدالة تنفذ مرة واحدة فقط'
+    ],
+    correct: 0
+  },
+  {
+    type: 'mcq',
+    text: 'ما الذي يمثله Argument في تعريف الدالة؟',
+    options: [
+      'نوع القيم المرسلة من برنامج الاستدعاء للدالة',
+      'اسم الدالة',
+      'نوع القيمة الراجعة',
+      'جسم الدالة'
+    ],
+    correct: 0
+  },
+  {
+    type: 'mcq',
+    text: 'كم طريقة لإرجاع التحكم إلى نقطة الاستدعاء في الدالة؟',
+    options: [
+      'ثلاث طرق: نهاية الدالة التلقائية، عبارة return، عبارة return expression',
+      'طريقة واحدة فقط وهي عبارة return',
+      'طريقتان: نهاية الدالة وعبارة break',
+      'أربع طرق'
+    ],
+    correct: 0
+  },
+  {
+    type: 'mcq',
+    text: 'ما هي الحلقات التكرارية المتداخلة (Nested Loops)؟',
+    options: [
+      'وجود حلقة تكرارية داخل حلقة تكرارية أخرى',
+      'حلقة تكرارية تعمل مرة واحدة فقط',
+      'حلقة تكرارية لا تنتهي أبداً',
+      'حلقتان تعملان بشكل متوازي'
+    ],
+    correct: 0
+  },
+  {
+    type: 'mcq',
+    text: 'ما هي الدالة المكتبية sqrt(n) وأي ملف دليل تحتاج؟',
+    options: [
+      'تجد الجذر التربيعي لـ n وتحتاج <math.h>',
+      'تجد مربع العدد n وتحتاج <math.h>',
+      'تجد الجذر التربيعي وتحتاج <iostream.h>',
+      'تجد القيمة المطلقة وتحتاج <stdlib.h>'
+    ],
+    correct: 0
+  },
+  {
+    type: 'mcq',
+    text: 'ماذا يعني التصريح: <code>long factorial(int);</code>؟',
+    options: [
+      'دالة تسمى factorial تستقبل قيمة int وتُرجع قيمة long',
+      'دالة تسمى factorial لا تستقبل شيء وتُرجع int',
+      'دالة تسمى long تستقبل factorial وتُرجع int',
+      'متغير من نوع long اسمه factorial'
+    ],
+    correct: 0
+  },
+  {
+    type: 'mcq',
+    text: 'ماذا يعني التصريح: <code>void drow(int, char, float);</code>؟',
+    options: [
+      'دالة تسمى drow تستقبل ثلاث قيم (int, char, float) ولا تُرجع قيمة',
+      'دالة تسمى void تستقبل int وتُرجع drow',
+      'دالة تسمى drow تُرجع قيمة من نوع int',
+      'متغير من نوع char يسمى drow'
+    ],
+    correct: 0
+  },
+  {
+    type: 'mcq',
+    text: 'هل يمكن تعريف دالة داخل جسم دالة أخرى في C++؟',
+    options: [
+      'لا، لا يمكن تعريف دالة داخل جسم دالة أخرى',
+      'نعم، يمكن ذلك',
+      'نعم ولكن بشروط معينة',
+      'نعم ولكن فقط في الدوال الراجعة'
+    ],
+    correct: 0
+  },
+  {
+    type: 'mcq',
+    text: 'في البرنامج التالي، إذا كانت قيمة x=1 في switch، ما قيمة b؟ <code>case 1: b=30+x; break;</code>',
+    options: ['31', '30', '1', '10'],
+    correct: 0
+  },
+
+  // ========== TRUE/FALSE ==========
+  {
+    type: 'tf',
+    text: 'في عبارة if البسيطة، إذا لم يكن الشرط صحيحاً لا يحدث شيء.',
+    correct: 'true'
+  },
+  {
+    type: 'tf',
+    text: 'المعامل AND يرجع القيمة true إذا كان أحد الحدثين فقط صحيحاً.',
+    correct: 'false'
+  },
+  {
+    type: 'tf',
+    text: 'المعامل OR يرجع القيمة false إذا كان كلا الحدثين false.',
+    correct: 'true'
+  },
+  {
+    type: 'tf',
+    text: 'المعامل NOT يرجع القيمة true إذا كان الحدث صحيحاً.',
+    correct: 'false'
+  },
+  {
+    type: 'tf',
+    text: 'العامل الشرطي في C++ هو العامل الوحيد الذي يعمل على ثلاثة قيم.',
+    correct: 'true'
+  },
+  {
+    type: 'tf',
+    text: 'عبارة switch يمكن استخدامها عندما تكون الشروط مرتبطة بقيم متغيرات مختلفة.',
+    correct: 'false'
+  },
+  {
+    type: 'tf',
+    text: 'تعتبر عبارة switch من أقوى عبارات C++ الخاصة بالقرارات.',
+    correct: 'true'
+  },
+  {
+    type: 'tf',
+    text: 'الأمر continue يُنهي الحلقة التكرارية نهائياً مثل الأمر break.',
+    correct: 'false'
+  },
+  {
+    type: 'tf',
+    text: 'تعتمد لغة C++ في بنيتها بشكل أساسي على الدوال.',
+    correct: 'true'
+  },
+  {
+    type: 'tf',
+    text: 'الدوال في C++ تساعد في اختصار البرنامج وتجنب تكرار العبارات.',
+    correct: 'true'
+  },
+  {
+    type: 'tf',
+    text: 'يجب أن يتم تحديد نموذج الدالة (prototype) بعد استدعاء الدالة.',
+    correct: 'false'
+  },
+  {
+    type: 'tf',
+    text: 'الدوال المكتبية مثل getch() لا تحتاج إلى تصريح لأنها معرّفة في ملفات الترويسات.',
+    correct: 'true'
+  },
+
+  // ========== MATCH ==========
+  {
+    type: 'match',
+    text: 'طابق بين كل أمر ووظيفته:',
+    pairs: [
+      { term: 'break', definition: 'الخروج من الحلقة أو switch' },
+      { term: 'continue', definition: 'تخطي التكرار الحالي والمتابعة' },
+      { term: 'goto', definition: 'نقل التحكم إلى label محدد' },
+      { term: 'exit(1)', definition: 'إنهاء البرنامج كاملاً' }
+    ]
+  },
+  {
+    type: 'match',
+    text: 'طابق كل مصطلح بتعريفه الصحيح:',
+    pairs: [
+      { term: 'Return_type', definition: 'نوع القيمة التي ترجعها الدالة' },
+      { term: 'Argument', definition: 'نوع القيم المرسلة إلى الدالة' },
+      { term: 'prototype', definition: 'نموذج الدالة قبل الاستدعاء' },
+      { term: 'void', definition: 'تعني أن الدالة لا تُرجع قيمة' }
+    ]
+  },
+
+  // ========== CHOOSE ==========
+  {
+    type: 'choose',
+    text: 'اختر جميع الفوائد الصحيحة لاستخدام الدوال في البرمجة:',
+    options: [
+      'اختصار البرنامج وتجنب التكرار',
+      'تسهيل عملية البرمجة',
+      'سهولة تتبع البرنامج واكتشاف الأخطاء',
+      'جعل البرنامج أبطأ في التنفيذ',
+      'دعم مفهوم البرمجة الجماعية',
+      'جعل البرنامج واضح المعالم'
+    ],
+    correct: [0, 1, 2, 4, 5]
+  },
+  {
+    type: 'choose',
+    text: 'اختر جميع أنواع عبارات التحكم الأخرى في C++:',
+    options: ['break', 'continue', 'exit(1)', 'switch', 'goto', 'for'],
+    correct: [0, 1, 2, 4]
+  }
+];
+
+// =============================================
+// GLOBAL STATE
+// =============================================
+let studentName = '';
+let timerInterval = null;
+let timeElapsed = 0;
+let timeLimit = 3600; // 60 minutes
+let answers = {};
+let submitted = false;
+let examStartTime = null;
+
+// =============================================
+// START EXAM
+// =============================================
+function startExam() {
+  const name = document.getElementById('input-name').value.trim();
+  if (!name) {
+    document.getElementById('input-name').style.borderColor = 'var(--red)';
+    document.getElementById('input-name').focus();
+    setTimeout(() => document.getElementById('input-name').style.borderColor = 'var(--border)', 2000);
+    return;
+  }
+  studentName = name;
+  document.getElementById('display-name').textContent = name;
+  document.getElementById('avatar-letter').textContent = name[0].toUpperCase();
+  document.getElementById('total-count').textContent = allQuestions.length;
+  document.getElementById('q-count').textContent = allQuestions.length;
+
+  showScreen('screen-exam');
+  renderQuestions();
+  startTimer();
+  examStartTime = Date.now();
+}
+
+// =============================================
+// RENDER QUESTIONS
+// =============================================
+function renderQuestions() {
+  const container = document.getElementById('questions-container');
+  container.innerHTML = '';
+
+  allQuestions.forEach((q, idx) => {
+    const card = document.createElement('div');
+    card.className = 'question-card';
+    card.id = `q-card-${idx}`;
+
+    const typeLabelMap = {
+      mcq: { cls: 'q-type-mcq', lbl: '📋 اختيار متعدد' },
+      tf: { cls: 'q-type-tf', lbl: '✔ صح أم خطأ' },
+      match: { cls: 'q-type-match', lbl: '🔗 مطابقة' },
+      choose: { cls: 'q-type-choose', lbl: '☑ اختر كل ما ينطبق' }
+    };
+
+    const tl = typeLabelMap[q.type];
+
+    card.innerHTML = `
+      <div class="question-header">
+        <div class="q-number">${idx + 1}</div>
+        <div style="flex:1">
+          <div class="q-type-badge ${tl.cls}">${tl.lbl}</div>
+          <div class="q-text">${q.text}</div>
+        </div>
+      </div>
+      ${renderOptions(q, idx)}
+      <div class="answer-feedback" id="feedback-${idx}"></div>
+    `;
+
+    container.appendChild(card);
+  });
+}
+
+function renderOptions(q, idx) {
+  if (q.type === 'mcq') {
+    return `<div class="options-grid">${q.options.map((opt, oi) => `
+      <label class="option-label" id="opt-${idx}-${oi}" onclick="recordAnswer(${idx},'${oi}')">
+        <input type="radio" name="q${idx}" value="${oi}">
+        <div class="option-dot"></div>
+        <div class="option-text">${opt}</div>
+      </label>
+    `).join('')}</div>`;
+  }
+
+  if (q.type === 'tf') {
+    return `<div class="tf-options">
+      <div class="tf-option true-opt" id="opt-${idx}-true" onclick="recordTF(${idx},'true')">✅ صح</div>
+      <div class="tf-option false-opt" id="opt-${idx}-false" onclick="recordTF(${idx},'false')">❌ خطأ</div>
+    </div>`;
+  }
+
+  if (q.type === 'match') {
+    const shuffled = [...q.pairs].sort(() => Math.random() - 0.5);
+    return `<div class="match-grid">${q.pairs.map((pair, pi) => `
+      <div class="match-row">
+        <div class="match-term">${pair.term}</div>
+        <div class="match-arrow">←</div>
+        <select class="match-select" id="match-${idx}-${pi}" onchange="recordMatch(${idx})">
+          <option value="">-- اختر --</option>
+          ${shuffled.map(s => `<option value="${s.definition}">${s.definition}</option>`).join('')}
+        </select>
+      </div>
+    `).join('')}</div>`;
+  }
+
+  if (q.type === 'choose') {
+    return `<div class="options-grid">${q.options.map((opt, oi) => `
+      <label class="option-label" id="opt-${idx}-${oi}" onclick="recordChoose(${idx}, ${oi})">
+        <input type="checkbox" name="q${idx}" value="${oi}">
+        <div class="option-dot" style="border-radius:4px"></div>
+        <div class="option-text">${opt}</div>
+      </label>
+    `).join('')}</div>`;
+  }
+}
+
+// =============================================
+// RECORD ANSWERS
+// =============================================
+function recordAnswer(idx, val) {
+  if (submitted) return;
+  answers[idx] = parseInt(val);
+  updateProgress();
+  document.getElementById(`q-card-${idx}`).classList.add('answered');
+}
+
+function recordTF(idx, val) {
+  if (submitted) return;
+  answers[idx] = val;
+  updateProgress();
+  document.getElementById(`q-card-${idx}`).classList.add('answered');
+  document.querySelectorAll(`#opt-${idx}-true, #opt-${idx}-false`).forEach(el => el.classList.remove('selected'));
+  document.getElementById(`opt-${idx}-${val}`).classList.add('selected');
+}
+
+function recordMatch(idx) {
+  if (submitted) return;
+  const q = allQuestions[idx];
+  let vals = {};
+  let allFilled = true;
+  q.pairs.forEach((_, pi) => {
+    const sel = document.getElementById(`match-${idx}-${pi}`);
+    vals[pi] = sel ? sel.value : '';
+    if (!vals[pi]) allFilled = false;
+  });
+  answers[idx] = vals;
+  if (allFilled) {
+    document.getElementById(`q-card-${idx}`).classList.add('answered');
+    updateProgress();
+  }
+}
+
+function recordChoose(idx, oi) {
+  if (submitted) return;
+  if (!answers[idx]) answers[idx] = [];
+  const arr = answers[idx];
+  const pos = arr.indexOf(oi);
+  if (pos === -1) arr.push(oi);
+  else arr.splice(pos, 1);
+  document.getElementById(`q-card-${idx}`).classList.toggle('answered', arr.length > 0);
+  updateProgress();
+}
+
+// =============================================
+// PROGRESS
+// =============================================
+function updateProgress() {
+  const answered = Object.keys(answers).length;
+  const total = allQuestions.length;
+  const pct = Math.round(answered / total * 100);
+  document.getElementById('answered-count').textContent = answered;
+  document.getElementById('progress-bar').style.width = pct + '%';
+  document.getElementById('progress-pct').textContent = pct + '%';
+}
+
+// =============================================
+// TIMER
+// =============================================
+function startTimer() {
+  let remaining = timeLimit;
+  timerInterval = setInterval(() => {
+    remaining--;
+    timeElapsed++;
+    const m = Math.floor(remaining / 60);
+    const s = remaining % 60;
+    document.getElementById('timer').textContent = `${m.toString().padStart(2,'0')}:${s.toString().padStart(2,'0')}`;
+    if (remaining <= 300) document.getElementById('timer').style.background = 'rgba(239,35,60,0.25)';
+    if (remaining <= 0) { clearInterval(timerInterval); submitExam(); }
+  }, 1000);
+}
+
+// =============================================
+// SUBMIT EXAM
+// =============================================
+function submitExam() {
+  if (submitted) return;
+  submitted = true;
+  clearInterval(timerInterval);
+
+  let correct = 0;
+  let wrong = 0;
+
+  allQuestions.forEach((q, idx) => {
+    const card = document.getElementById(`q-card-${idx}`);
+    const feedback = document.getElementById(`feedback-${idx}`);
+    let isCorrect = false;
+
+    if (q.type === 'mcq') {
+      const userAns = answers[idx];
+      q.options.forEach((_, oi) => {
+        const label = document.getElementById(`opt-${idx}-${oi}`);
+        if (!label) return;
+        label.classList.add('disabled');
+        if (oi === q.correct) label.classList.add('correct-ans');
+        else if (oi === userAns && userAns !== q.correct) label.classList.add('wrong-ans');
+      });
+      isCorrect = userAns === q.correct;
+      feedback.className = `answer-feedback show ${isCorrect ? 'correct' : 'incorrect'}`;
+      feedback.innerHTML = isCorrect
+        ? '✅ إجابة صحيحة!'
+        : `❌ إجابة خاطئة. الإجابة الصحيحة: ${q.options[q.correct]}`;
+    }
+
+    else if (q.type === 'tf') {
+      const userAns = answers[idx];
+      ['true','false'].forEach(v => {
+        const el = document.getElementById(`opt-${idx}-${v}`);
+        if (!el) return;
+        el.classList.add('disabled');
+        if (v === q.correct) el.classList.add('correct-ans');
+        else if (v === userAns) el.classList.add('wrong-ans');
+      });
+      isCorrect = userAns === q.correct;
+      feedback.className = `answer-feedback show ${isCorrect ? 'correct' : 'incorrect'}`;
+      feedback.innerHTML = isCorrect
+        ? '✅ إجابة صحيحة!'
+        : `❌ إجابة خاطئة. الإجابة الصحيحة: ${q.correct === 'true' ? 'صح ✅' : 'خطأ ❌'}`;
+    }
+
+    else if (q.type === 'match') {
+      const userAns = answers[idx] || {};
+      let matchCorrect = 0;
+      q.pairs.forEach((pair, pi) => {
+        const sel = document.getElementById(`match-${idx}-${pi}`);
+        if (!sel) return;
+        sel.disabled = true;
+        if (userAns[pi] === pair.definition) {
+          sel.classList.add('correct');
+          matchCorrect++;
+        } else {
+          sel.classList.add('wrong');
+        }
+      });
+      isCorrect = matchCorrect === q.pairs.length;
+      const partial = matchCorrect > 0 && !isCorrect;
+      feedback.className = `answer-feedback show ${isCorrect ? 'correct' : 'incorrect'}`;
+      feedback.innerHTML = isCorrect
+        ? '✅ جميع التطابقات صحيحة!'
+        : partial
+          ? `⚠️ ${matchCorrect} من ${q.pairs.length} تطابقات صحيحة`
+          : '❌ لا توجد تطابقات صحيحة';
+      if (partial) { correct += 0.5; card.classList.add('correct'); return; }
+    }
+
+    else if (q.type === 'choose') {
+      const userAns = answers[idx] || [];
+      const correctSet = new Set(q.correct);
+      const userSet = new Set(userAns);
+      q.options.forEach((_, oi) => {
+        const label = document.getElementById(`opt-${idx}-${oi}`);
+        if (!label) return;
+        label.classList.add('disabled');
+        if (correctSet.has(oi)) label.classList.add('correct-ans');
+        else if (userSet.has(oi)) label.classList.add('wrong-ans');
+      });
+      const correctSelected = userAns.filter(a => correctSet.has(a)).length;
+      const wrongSelected = userAns.filter(a => !correctSet.has(a)).length;
+      isCorrect = correctSelected === q.correct.length && wrongSelected === 0;
+      feedback.className = `answer-feedback show ${isCorrect ? 'correct' : 'incorrect'}`;
+      feedback.innerHTML = isCorrect
+        ? '✅ اخترت جميع الإجابات الصحيحة!'
+        : `❌ اخترت ${correctSelected} من ${q.correct.length} إجابات صحيحة مع ${wrongSelected} خاطئة`;
+    }
+
+    if (isCorrect) { correct++; card.classList.add('correct'); }
+    else { wrong++; card.classList.add('wrong'); }
+  });
+
+  // Disable submit
+  document.querySelector('.btn-submit').disabled = true;
+  document.querySelector('.btn-submit').style.opacity = '0.5';
+
+  // Show result
+  setTimeout(() => showResult(correct, wrong), 800);
+}
+
+// =============================================
+// SHOW RESULT
+// =============================================
+function showResult(correct, wrong) {
+  const total = allQuestions.length;
+  const pct = Math.round(correct / total * 100);
+  const evaluation = getEvaluation(pct);
+
+  // Save to localStorage
+  const results = JSON.parse(localStorage.getItem('cpp_exam_results') || '[]');
+  const existing = results.findIndex(r => r.name === studentName);
+  const entry = {
+    name: studentName,
+    score: correct,
+    total,
+    pct,
+    evaluation,
+    time: timeElapsed,
+    date: new Date().toLocaleDateString('ar-SA')
+  };
+  if (existing >= 0) results[existing] = entry;
+  else results.push(entry);
+  results.sort((a, b) => b.score - a.score);
+  localStorage.setItem('cpp_exam_results', JSON.stringify(results));
+
+  // Show screen
+  showScreen('screen-result');
+
+  // Fill result
+  document.getElementById('result-name').textContent = `الطالب: ${studentName}`;
+  document.getElementById('result-eval').textContent = evaluation.label;
+  document.getElementById('result-eval').style.color = evaluation.color;
+  document.getElementById('result-trophy').textContent = evaluation.trophy;
+  document.getElementById('score-num').textContent = correct;
+  document.getElementById('score-total').textContent = `/ ${total}`;
+  document.getElementById('score-pct').textContent = pct + '%';
+  document.getElementById('r-correct').textContent = correct;
+  document.getElementById('r-wrong').textContent = wrong + (total - correct - wrong);
+  const m = Math.floor(timeElapsed / 60);
+  const s = timeElapsed % 60;
+  document.getElementById('r-time').textContent = `${m}:${s.toString().padStart(2,'0')}`;
+
+  // Circle
+  const circlePct = (pct / 100 * 360);
+  document.getElementById('score-circle').style.setProperty('--pct', `${pct}%`);
+  document.getElementById('score-circle').style.background =
+    `conic-gradient(${evaluation.color} 0%, ${evaluation.color} ${pct}%, rgba(255,255,255,0.06) ${pct}%)`;
+
+  // Leaderboard
+  const lb = document.getElementById('leaderboard-body');
+  lb.innerHTML = '';
+  results.forEach((r, i) => {
+    const ev = getEvaluation(r.pct);
+    const isMe = r.name === studentName;
+    lb.innerHTML += `
+      <div class="lb-row ${isMe ? 'highlight' : ''}">
+        <div><div class="rank-badge rank-${i < 3 ? i+1 : 'other'}">${i+1}</div></div>
+        <div class="lb-name">${r.name}${isMe ? ' 🎓' : ''}</div>
+        <div class="lb-score">${r.score}/${r.total}</div>
+        <div class="lb-pct">${r.pct}%</div>
+        <div><span class="eval-pill" style="background:${ev.bg};color:${ev.color}">${ev.label}</span></div>
+      </div>
+    `;
+  });
+
+  // Confetti if good score
+  if (pct >= 60) launchConfetti();
+
+  window.scrollTo(0, 0);
+}
+
+function getEvaluation(pct) {
+  if (pct >= 90) return { label: 'ممتاز', color: '#00b4d8', bg: 'rgba(0,180,216,0.15)', trophy: '🏆' };
+  if (pct >= 80) return { label: 'جيد جداً', color: '#06d6a0', bg: 'rgba(6,214,160,0.15)', trophy: '🥇' };
+  if (pct >= 70) return { label: 'جيد', color: '#f5a623', bg: 'rgba(245,166,35,0.15)', trophy: '🥈' };
+  if (pct >= 60) return { label: 'مقبول', color: '#a359ff', bg: 'rgba(163,89,255,0.15)', trophy: '🥉' };
+  return { label: 'يحتاج مراجعة', color: '#ef233c', bg: 'rgba(239,35,60,0.15)', trophy: '📚' };
+}
+
+// =============================================
+// CONFETTI
+// =============================================
+function launchConfetti() {
+  const colors = ['#00b4d8','#06d6a0','#f5a623','#e94560','#a359ff','#fff'];
+  for (let i = 0; i < 60; i++) {
+    setTimeout(() => {
+      const c = document.createElement('div');
+      c.className = 'confetti-piece';
+      c.style.cssText = `
+        left: ${Math.random() * 100}vw;
+        background: ${colors[Math.floor(Math.random() * colors.length)]};
+        animation-duration: ${2 + Math.random() * 3}s;
+        transform: rotate(${Math.random() * 360}deg);
+      `;
+      document.body.appendChild(c);
+      setTimeout(() => c.remove(), 5000);
+    }, i * 50);
+  }
+}
+
+// =============================================
+// SCREEN MANAGEMENT
+// =============================================
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  window.scrollTo(0, 0);
+}
+
+// =============================================
+// RETRY / REVIEW
+// =============================================
+function retryExam() {
+  submitted = false;
+  answers = {};
+  timeElapsed = 0;
+  clearInterval(timerInterval);
+  showScreen('screen-reg');
+  document.getElementById('input-name').value = '';
+}
+
+function reviewExam() {
+  showScreen('screen-exam');
+  document.querySelector('.btn-submit').style.display = 'none';
+  window.scrollTo(0, 0);
+}
+</script>
+</body>
+</html>
